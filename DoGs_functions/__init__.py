@@ -197,41 +197,39 @@ def PE_Mod(PE,strand,path_bam,output_path):
 		sam_strng=commands.getstatusoutput('samtools')
 		temp=sam_strng[1].split("Version:")[1][:7]
 		sam_version=int(filter(str.isdigit, temp))
-
 		if sam_version==119:
 			outfile = pysam.AlignmentFile(output_path+"/"+base_name.split(".bam")[0]+"_temp.bam", "wb", template=infile)
 		else:
 			outfile = pysam.AlignmentFile(output_path+"/"+base_name.split(".bam")[0]+"_temp.bam", "wb",add_sam_header=True, template=infile)
 
-		if strand != 'non':
-			for read in infile:
-				Flag=read.flag;
-				if strand=='second':
-					if (Flag==145 or Flag==147 or Flag==153 or Flag==97 or Flag==99  or Flag==73 ):
-						if Flag<100 :
-							read.flag=145
-						read.set_tag("XS",'-', replace=True)
-						outfile.write(read)
-					if (Flag==161 or Flag==163 or Flag==81 or Flag==83 or Flag==89  or Flag==137 ):
-						if Flag<100 :
-							read.flag=161
-						read.set_tag("XS",'+', replace=True)
-						outfile.write(read)
-				if strand=='first':      
-					if (Flag==145 or Flag==147 or Flag==153 or Flag==97 or Flag==99  or Flag==73 ):
-						if Flag>100 :
-							read.flag=97
-						read.set_tag("XS",'+', replace=True)
-						outfile.write(read)
-					if (Flag==161 or Flag==163 or Flag==81 or Flag==83 or Flag==89  or Flag==137 ):
-						if Flag>100 :
-							read.flag=81
-						read.set_tag("XS",'-', replace=True)       
-						outfile.write(read)
-		#in the case where the library is PE but unstranded, just copy bam file
-		elif strand =='non':                                           
-    			shutil.copyfile(path_bam, out_name)
-		
+
+
+		for read in infile:
+			Flag=read.flag;
+			if strand=='second':
+				if (Flag==145 or Flag==147 or Flag==153 or Flag==97 or Flag==99  or Flag==73 ):
+					if Flag<100 :
+						read.flag=145
+					read.set_tag("XS",'-', replace=True)
+					outfile.write(read)
+				if (Flag==161 or Flag==163 or Flag==81 or Flag==83 or Flag==89  or Flag==137 ):
+					if Flag<100 :
+						read.flag=161
+					read.set_tag("XS",'+', replace=True)
+					outfile.write(read)
+			if strand=='first':      
+				if (Flag==145 or Flag==147 or Flag==153 or Flag==97 or Flag==99  or Flag==73 ):
+					if Flag>100 :
+						read.flag=97
+					read.set_tag("XS",'+', replace=True)
+					outfile.write(read)
+				if (Flag==161 or Flag==163 or Flag==81 or Flag==83 or Flag==89  or Flag==137 ):
+					if Flag>100 :
+						read.flag=81
+					read.set_tag("XS",'-', replace=True)       
+					outfile.write(read)
+			if strand=='non':
+				outfile.write(read)
 
 		infile.close()
 		outfile.close()		
