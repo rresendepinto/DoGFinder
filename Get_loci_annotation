@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/opt/conda/bin/python
 import pybedtools
 import sys
 import pandas as pd
@@ -79,14 +79,19 @@ df_trans_annot=pd.merge(df_anot_temp_min, df_anot_temp_max, how='inner', on=['tr
 df_trans_annot=df_trans_annot[['seqname', 'start','end','gene_id','score','strand']]
 
 trans_annot=pybedtools.BedTool.from_dataframe(df_trans_annot)
+
 trans_annot=trans_annot.sort()
-merge_annot = trans_annot.merge(c=4,o='distinct',s=True);
+
+merge_annot = trans_annot.merge(c=(4,6),o='distinct',s=True);
 
 df_merge_annot=pybedtools.BedTool.to_dataframe(merge_annot);
 
-df_merge_annot.columns=['chrom','start','end','strand','name'];
+
+df_merge_annot.columns=['chrom','start','end','name','strand'];
+
 df_merge_annot['score']=0;
 df_merge_annot=df_merge_annot[['chrom','start','end','name','score','strand']]
+
 df_merge_annot['name'] = df_merge_annot['name'].str.replace(',','&')
 
 path_annot_temp="%s/loci_annotation%s.bed" % (output_path,out_name) ;
